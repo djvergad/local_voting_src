@@ -17,7 +17,7 @@ public class TDMAScheduller implements Handleable {
 
     Network network;
     Simulator simulator;
-    double slotTime;
+    public double slotTime;
     int currentSlot;
     int currentFrame;
 

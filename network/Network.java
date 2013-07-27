@@ -16,7 +16,7 @@ import java.util.PriorityQueue;
  */
 public class Network {
 
-    ArrayList<Node> nodes;
+    public ArrayList<Node> nodes;
     ArrayList<Slot> slots;
 
     boolean findSlot(Node node) {

@@ -4,7 +4,7 @@
  */
 package network;
 
-import application.TrafficGenerator;
+import application.Connection;
 
 /**
  *
@@ -16,14 +16,16 @@ public class Packet implements Comparable<Packet>{
     static int packetcount;
     Integer id;
     public int sequenceNumber;
-    public TrafficGenerator trafficGenerator;
+    public Connection connection;
+    public double timeSent;
 
-    public Packet(Node src, Node dst, int sequenceNumber, TrafficGenerator trafficGenerator) {
+    public Packet(Node src, Node dst, int sequenceNumber, Connection trafficGenerator) {
         this.src = src;
         this.dst = dst;
-        this.trafficGenerator = trafficGenerator;
+        this.connection = trafficGenerator;
         this.sequenceNumber = sequenceNumber;
         this.id = packetcount++;
+        this.timeSent = trafficGenerator.simulator.now;
     }
 
     @Override

@@ -192,7 +192,7 @@ public class Lobats extends Lyui {
                 }
             }
         }
-        System.out.println("Things seem ok...");
+//        System.out.println("Things seem ok...");
     }
 
     Set<Node> getOneTwoNeighbors(Node node) {

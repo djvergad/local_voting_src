@@ -6,6 +6,7 @@ package stability;
 
 import application.StartGenerator;
 import application.Connection;
+import application.ExpoGenerator;
 import java.util.Set;
 import network.Scenario;
 
@@ -13,7 +14,7 @@ import network.Scenario;
  *
  * @author bruker
  */
-public class StabilityTest {
+public class ExpoTest {
 
     /**
      * @param args the command line arguments
@@ -21,25 +22,30 @@ public class StabilityTest {
     public static void main(String[] args) {
 
         //Scenario scenario = new Scenario(100, 10, 100, 10);
-        
+
         int nodes = 100;
         double transmissionRange = 10;
         double topologySize = 100;
         int slots = 10;
 //        int connections = 30;
         int connections = 2;
-         Scenario.SchedulerType type = Scenario.SchedulerType.LQF;
-   //    Scenario.SchedulerType type = Scenario.SchedulerType.Lobats;
+        Scenario.SchedulerType type = Scenario.SchedulerType.Simple;
+//        Scenario.SchedulerType type = Scenario.SchedulerType.Lobats;
 
 //        Scenario scenario = new Scenario(10, 10, 50, 10, Scenario.SchedulerType.Balanced);
         Scenario scenario = new Scenario(nodes, transmissionRange, topologySize, slots, type);
-        Set<Connection> trafficGenerators = StartGenerator.generate(connections, scenario);
+        ExpoGenerator expoGen = new ExpoGenerator(scenario, 0.0001, 0.01);
+
+        Set<Connection> connectionSet = expoGen.conSet;
         scenario.simulator.run();
-        
-        scenario.printStats();
-        for (Connection tg : trafficGenerators) {
-            System.out.println("Connection: " +tg.getTotalTime());
-        }
-        
+
+//        scenario.printStats();
+//        for (Connection conn : connectionSet) {
+//            System.out.println("Connection: " + conn.getTotalTime());
+//            conn.dump();
+//        }
+
+        expoGen.stats.dump();
+
     }
 }

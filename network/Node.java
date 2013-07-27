@@ -79,7 +79,7 @@ public class Node {
     public void receive(Packet packet) {
         if (packet.dst == this) {
      //       System.out.println("Packet arrived to its destination at " + this);
-            packet.trafficGenerator.ack(packet);
+            packet.connection.ack(packet);
         } else {
             backlog.add(packet);
         }

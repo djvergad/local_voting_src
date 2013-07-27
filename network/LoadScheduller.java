@@ -42,7 +42,7 @@ public class LoadScheduller extends SimpleDynamic {
                 System.exit(-1);
             }
         } else {
-            System.out.println("No slots available - sorry!");
+//            System.out.println("No slots available - sorry!");
         }
     }
 

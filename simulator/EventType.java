@@ -11,5 +11,6 @@ package simulator;
 public enum EventType {
     NextSlot,
     EndSimulation,
-    PacketGen
+    PacketGen,
+    ConnectionArrival
 }

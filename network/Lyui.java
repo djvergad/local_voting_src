@@ -21,7 +21,7 @@ public class Lyui extends DRAND {
         super(network, simulator, slotTime);
         
         execLyui();
-        network.dumpSlots();
+//        network.dumpSlots();
     }
     final Map<Node, Integer> defaultColor = new HashMap<>();
     

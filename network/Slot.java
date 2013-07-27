@@ -15,6 +15,10 @@ import java.util.Set;
 public class Slot {
 
     Set<Reservation> reservations = new HashSet<>();
+    
+    public Slot() {
+        
+    }
 
     boolean checkNode(Node node) {
         for (Reservation reservation : reservations) {

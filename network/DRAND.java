@@ -20,7 +20,7 @@ public class DRAND extends TDMAScheduller {
 
         createSchedulle();
 
-        network.dumpSlots();
+//        network.dumpSlots();
 
 
     }
@@ -75,7 +75,7 @@ public class DRAND extends TDMAScheduller {
                 if (max_k > 0 && Math.random() < 1.0 / max_k) {
                     // try to add the node
                     if (slot.addNode(node)) {
-                        System.out.println("Added node " + node + " to slot " + slot);
+//                        System.out.println("Added node " + node + " to slot " + slot);
                         toRemove.add(node);
 
                     }
