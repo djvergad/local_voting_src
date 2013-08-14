@@ -4,8 +4,6 @@
  */
 package network;
 
-import simulator.Event;
-import simulator.EventType;
 import simulator.Simulator;
 
 /**

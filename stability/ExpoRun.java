@@ -4,10 +4,7 @@
  */
 package stability;
 
-import application.StartGenerator;
-import application.Connection;
 import application.ExpoGenerator;
-import java.util.Set;
 import network.Scenario;
 
 /**
@@ -31,17 +28,8 @@ public class ExpoRun {
         
 //        Scenario scenario = new Scenario(10, 10, 50, 10, Scenario.SchedulerType.Balanced);
         Scenario scenario = new Scenario(nodes, transmissionRange, topologySize, slots, type);        
-        ExpoGenerator expoGen = new ExpoGenerator(scenario, arrivalRate, 0.01);
-
-        Set<Connection> connectionSet = expoGen.conSet;
+        ExpoGenerator expoGen = new ExpoGenerator(scenario, arrivalRate, 0.001);
         scenario.simulator.run();
-
-//        scenario.printStats();
-//        for (Connection conn : connectionSet) {
-//            System.out.println("Connection: " + conn.getTotalTime());
-//            conn.dump();
-//        }
-
         expoGen.stats.dump();
 
     }

@@ -95,7 +95,7 @@ public class Scenario {
 
 
 
-        simulator.offer(new Event(110000, EventType.EndSimulation, simulator));
+        simulator.offer(new Event(300000, EventType.EndSimulation, simulator));
 
 //        for (int i = 0; i < connections; i++) {
 //            Node src = network.nodes.get((int) (Math.random() * network.nodes.size()));

@@ -20,6 +20,7 @@ public class Statistics {
         double stoptime;
         int packets;
         double sumDelay;
+        Connection connection;
 
         void log(Packet p, double time) {
             packets++;
@@ -53,7 +54,9 @@ public class Statistics {
             if (!conStatMap.containsKey(packet.connection)) {
                 ConnStats connStats = new ConnStats();
                 connStats.starttime = timeReceived;
+                connStats.connection = packet.connection;
                 conStatMap.put(packet.connection, connStats);
+
             }
             conStatMap.get(packet.connection).log(packet, timeReceived);
         }
@@ -64,7 +67,7 @@ public class Statistics {
                 / (lastReceptionTime - starttime)
                 + "\tDelay:\t" + sumDelay / numPackets);
 
-        double sumth = 0D, sumth2 = 0D, sumdel = 0D, sumdel2 = 0D;
+        double sumth = 0D, sumth2 = 0D, sumdel = 0D, sumdel2 = 0D, sumdt = 0D, sumdt2 = 0D;
         int countth = 0, countdel = 0;
         for (ConnStats connStats : conStatMap.values()) {
             if (!Double.isNaN(connStats.throughput())) {
@@ -76,12 +79,16 @@ public class Statistics {
             countdel++;
             sumdel += connStats.delay();
             sumdel2 += Math.pow(connStats.delay(), 2);
+
+            sumdt += connStats.stoptime - connStats.connection.started;
+            sumdt2 += Math.pow(connStats.stoptime - connStats.connection.started, 2);
 //            System.out.println("throughput:\t" + connStats.throughput()+
 //                    "\tdelay:\t"+connStats.delay());
 
 
         }
-        System.out.println("\tThFair:\t" + Math.pow(sumth, 2) / (countth * sumth2)
-                + "\tDelFair:\t" + Math.pow(sumdel, 2) / (countdel * sumdel2));
+        System.out.println("\tDeliveryTime:\t" + sumdt / countdel + "\tThFair:\t" + Math.pow(sumth, 2) / (countth * sumth2)
+                + "\tDelFair:\t" + Math.pow(sumdel, 2) / (countdel * sumdel2) + "\tFairDelivery:\t"
+                + Math.pow(sumdt, 2) / (countdel * sumdt2));
     }
 }

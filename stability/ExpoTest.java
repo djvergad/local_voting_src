@@ -34,7 +34,7 @@ public class ExpoTest {
 
 //        Scenario scenario = new Scenario(10, 10, 50, 10, Scenario.SchedulerType.Balanced);
         Scenario scenario = new Scenario(nodes, transmissionRange, topologySize, slots, type);
-        ExpoGenerator expoGen = new ExpoGenerator(scenario, 0.0001, 0.01);
+        ExpoGenerator expoGen = new ExpoGenerator(scenario, 0.0001, 0.001);
 
         Set<Connection> connectionSet = expoGen.conSet;
         scenario.simulator.run();
