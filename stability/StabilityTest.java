@@ -8,6 +8,7 @@ import application.StartGenerator;
 import application.Connection;
 import java.util.Set;
 import network.Scenario;
+import network.SimpleDynamic;
 
 /**
  *
@@ -18,8 +19,9 @@ public class StabilityTest {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String [] args) {
 
+        SimpleDynamic.verbose = SimpleDynamic.Verbose.PRINT_QUEUE_LENGTHS;
         //Scenario scenario = new Scenario(100, 10, 100, 10);
         
         int nodes = 100;
@@ -27,8 +29,8 @@ public class StabilityTest {
         double topologySize = 100;
         int slots = 10;
 //        int connections = 30;
-        int connections = 2;
-         Scenario.SchedulerType type = Scenario.SchedulerType.LQF;
+        int connections = 15;
+         Scenario.SchedulerType type = Scenario.SchedulerType.Balanced;
    //    Scenario.SchedulerType type = Scenario.SchedulerType.Lobats;
 
 //        Scenario scenario = new Scenario(10, 10, 50, 10, Scenario.SchedulerType.Balanced);
@@ -36,10 +38,10 @@ public class StabilityTest {
         Set<Connection> trafficGenerators = StartGenerator.generate(connections, scenario);
         scenario.simulator.run();
         
-        scenario.printStats();
-        for (Connection tg : trafficGenerators) {
-            System.out.println("Connection: " +tg.getTotalTime());
-        }
+//        scenario.printStats();
+//        for (Connection tg : trafficGenerators) {
+//            System.out.println("Connection: " +tg.getTotalTime());
+//        }
         
     }
 }

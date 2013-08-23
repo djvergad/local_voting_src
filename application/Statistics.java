@@ -41,7 +41,7 @@ public class Statistics {
         }
     }
     Map<Connection, ConnStats> conStatMap = new HashMap<>();
-    double starttime = 110000D / 3;
+    public static double starttime = 110000D / 3;
     double lastReceptionTime;
     int numPackets;
     double sumDelay;

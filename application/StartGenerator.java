@@ -22,7 +22,7 @@ public class StartGenerator {
         for (int i = 0; i < connections; i++) {
             Node src = scenario.network.nodes.get((int) (Math.random() * scenario.network.nodes.size()));
             Node dst = scenario.network.nodes.get((int) (Math.random() * scenario.network.nodes.size()));
-            System.out.println(scenario.network.nodes.size() + " " + src + " " + dst);
+//            System.out.println(scenario.network.nodes.size() + " " + src + " " + dst);
             trafficGenerators.add(new Connection(src, dst, scenario.simulator, 100, 5 *  scenario.scheduller.slotTime, 1.0, stats));
         }
         return trafficGenerators;
