@@ -8,6 +8,7 @@ import application.StartGenerator;
 import application.Connection;
 import application.ExpoGenerator;
 import java.util.Set;
+import network.Node;
 import network.Scenario;
 import network.SimpleDynamic;
 
@@ -22,7 +23,7 @@ public class ExpoTest {
      */
     public static void main(String[] args) {
 
-        SimpleDynamic.verbose = SimpleDynamic.Verbose.PRINT_W;
+//        SimpleDynamic.verbose = SimpleDynamic.Verbose.PRINT_W;
 
         int nodes = 100;
         double transmissionRange = 10;
@@ -30,6 +31,7 @@ public class ExpoTest {
         int slots = 10;
         double arrivalRate = 0.001;
         Scenario.SchedulerType type = Scenario.SchedulerType.Simple;
+        Node.packet_loss = 0.0D;
 
 //        Scenario scenario = new Scenario(10, 10, 50, 10, Scenario.SchedulerType.Balanced);
         Scenario scenario = new Scenario(nodes, transmissionRange, topologySize, slots, type);
@@ -44,7 +46,7 @@ public class ExpoTest {
 //            conn.dump();
 //        }
 
-//        expoGen.stats.dump();
+        expoGen.stats.dump();
 
     }
 }

@@ -5,6 +5,7 @@
 package stability;
 
 import application.ExpoGenerator;
+import network.Node;
 import network.Scenario;
 
 /**
@@ -25,6 +26,7 @@ public class ExpoRun {
         int slots = Integer.valueOf(args[3]);
         double arrivalRate = Double.valueOf(args[4]);
         Scenario.SchedulerType type = Scenario.SchedulerType.valueOf(args[5]);
+        Node.packet_loss = Double.valueOf(args[6]);
         
 //        Scenario scenario = new Scenario(10, 10, 50, 10, Scenario.SchedulerType.Balanced);
         Scenario scenario = new Scenario(nodes, transmissionRange, topologySize, slots, type);        

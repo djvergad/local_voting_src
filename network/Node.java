@@ -28,6 +28,7 @@ public class Node {
     static int id_helper;
     double weight = 1;
     double utilization =0;
+    public static double packet_loss = 0D;
 
     public Node() {
         id = id_helper++;
@@ -50,12 +51,47 @@ public class Node {
         reservation.slot.reservations.remove(reservation);
     }
 
+    /** 
+     * Obsolete 
+     */
+    void transmit_no_error() {
+        
+        double alpha_utilization = 0.1;
+        
+        if (!backlog.isEmpty()) {
+            utilization = alpha_utilization+ (1-alpha_utilization)*utilization;
+            
+            Packet packet = backlog.poll();
+            if (packet.dst == this) {
+                System.err.println("This should not happen :(");
+                System.exit(-1);
+            }
+            if (routingtable.containsKey(packet.dst)) {
+//                System.out.println("Node " + this+ " forwarding packet to "
+//                        + routingtable.get(packet.dst) + ", final destination "
+//                        + packet.dst);
+                routingtable.get(packet.dst).receive(packet);
+            } else {
+//                System.out.println("Can't find route to " + packet.dst
+//                        + "... Dropping packet");
+            }
+        } else {
+            utilization = (1-alpha_utilization)*utilization;
+        }
+    }
+    
+    
     void transmit() {
         
         double alpha_utilization = 0.1;
         
         if (!backlog.isEmpty()) {
             utilization = alpha_utilization+ (1-alpha_utilization)*utilization;
+            
+            // If we have packet loss nothing happens
+            if (Math.random() < packet_loss) {
+                return;
+            }
             
             Packet packet = backlog.poll();
             if (packet.dst == this) {
