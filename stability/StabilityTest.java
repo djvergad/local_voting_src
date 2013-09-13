@@ -7,6 +7,7 @@ package stability;
 import application.StartGenerator;
 import application.Connection;
 import java.util.Set;
+import network.LocalVoting;
 import network.Scenario;
 import network.SimpleDynamic;
 
@@ -21,6 +22,7 @@ public class StabilityTest {
      */
     public static void main(String [] args) {
 
+        LocalVoting.verbose = LocalVoting.Verbose.PRINT_QUEUE_LENGTHS;
         SimpleDynamic.verbose = SimpleDynamic.Verbose.PRINT_QUEUE_LENGTHS;
         //Scenario scenario = new Scenario(100, 10, 100, 10);
         
@@ -30,7 +32,7 @@ public class StabilityTest {
         int slots = 10;
 //        int connections = 30;
         int connections = 15;
-         Scenario.SchedulerType type = Scenario.SchedulerType.Balanced;
+         Scenario.SchedulerType type = Scenario.SchedulerType.Simple;
    //    Scenario.SchedulerType type = Scenario.SchedulerType.Lobats;
 
 //        Scenario scenario = new Scenario(10, 10, 50, 10, Scenario.SchedulerType.Balanced);

@@ -36,8 +36,8 @@ public class TDMAScheduller implements Handleable {
         if (currentSlot == 0) {
             nextFrame();
         }
-        
-        
+
+
 //        System.out.println(simulator.now + " Slot " + currentSlot);
         for (Reservation reservation : network.slots.get(currentSlot).reservations) {
             reservation.sender.transmit();
@@ -67,5 +67,16 @@ public class TDMAScheduller implements Handleable {
                 System.err.println("Wrong event type");
                 System.exit(-1);
         }
+    }
+
+    public Reservation getSlot(Node node, Node neighbor) {
+        for (Reservation res : neighbor.reservations) {
+            if (res.blocked.contains(node)) {
+                if (res.slot.checkNode(node, res)) {
+                    return res;
+                }
+            }
+        }
+        return null;
     }
 }

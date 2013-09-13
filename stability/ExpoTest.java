@@ -4,13 +4,12 @@
  */
 package stability;
 
-import application.StartGenerator;
 import application.Connection;
 import application.ExpoGenerator;
 import java.util.Set;
+import network.LocalVoting;
 import network.Node;
 import network.Scenario;
-import network.SimpleDynamic;
 
 /**
  *
@@ -24,13 +23,15 @@ public class ExpoTest {
     public static void main(String[] args) {
 
 //        SimpleDynamic.verbose = SimpleDynamic.Verbose.PRINT_W;
+        LocalVoting.verbose = LocalVoting.Verbose.PRINT_QUEUE_LENGTHS;
 
         int nodes = 100;
         double transmissionRange = 10;
         double topologySize = 100;
         int slots = 10;
         double arrivalRate = 0.001;
-        Scenario.SchedulerType type = Scenario.SchedulerType.Simple;
+//        Scenario.SchedulerType type = Scenario.SchedulerType.Balanced;
+        Scenario.SchedulerType type = Scenario.SchedulerType.LocalVoting;
         Node.packet_loss = 0.0D;
 
 //        Scenario scenario = new Scenario(10, 10, 50, 10, Scenario.SchedulerType.Balanced);

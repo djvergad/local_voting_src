@@ -46,14 +46,5 @@ public class LoadScheduller extends SimpleDynamic {
         }
     }
 
-    public Reservation getSlot(Node node, Node neighbor) {
-        for (Reservation res : neighbor.reservations) {
-            if (res.blocked.contains(node)) {
-                if (res.slot.checkNode(node, res)) {
-                    return res;
-                }
-            }
-        }
-        return null;
-    }
+
 }

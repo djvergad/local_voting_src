@@ -34,7 +34,8 @@ public class Scenario {
         LQF,
         DRAND,
         Lyui,
-        Lobats
+        Lobats,
+        LocalVoting
     }
 
     public Scenario(int nodes, double transmissionRange, double topologySize, int slots, SchedulerType type) {
@@ -86,6 +87,9 @@ public class Scenario {
                 break;
             case Lobats:
                 scheduller = new Lobats(network, simulator, 1.0);
+                break;
+            case LocalVoting:
+                scheduller = new LocalVoting(network, simulator, 1.0);
                 break;
             default:
                 System.err.println("Wrong Type");

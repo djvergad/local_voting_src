@@ -125,4 +125,12 @@ public class Node {
         return (1.0 * backlog.size()) / reservations.size();
     }
     
+    public Double getX() {
+        if (backlog.size() == 0) {
+            System.err.println("X cannot be computed if backlog is zero");
+            System.exit(-1);
+        }
+        return (reservations.size()*1D)/backlog.size();
+    }
+    
 }
