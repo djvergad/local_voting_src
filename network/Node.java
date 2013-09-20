@@ -27,8 +27,9 @@ public class Node {
     int id;
     static int id_helper;
     double weight = 1;
-    double utilization =0;
+    double utilization = 0;
     public static double packet_loss = 0D;
+    Double x_1=0D, x_2=0D;
 
     public Node() {
         id = id_helper++;
@@ -51,16 +52,16 @@ public class Node {
         reservation.slot.reservations.remove(reservation);
     }
 
-    /** 
-     * Obsolete 
+    /**
+     * Obsolete
      */
     void transmit_no_error() {
-        
+
         double alpha_utilization = 0.1;
-        
+
         if (!backlog.isEmpty()) {
-            utilization = alpha_utilization+ (1-alpha_utilization)*utilization;
-            
+            utilization = alpha_utilization + (1 - alpha_utilization) * utilization;
+
             Packet packet = backlog.poll();
             if (packet.dst == this) {
                 System.err.println("This should not happen :(");
@@ -76,23 +77,22 @@ public class Node {
 //                        + "... Dropping packet");
             }
         } else {
-            utilization = (1-alpha_utilization)*utilization;
+            utilization = (1 - alpha_utilization) * utilization;
         }
     }
-    
-    
+
     void transmit() {
-        
+
         double alpha_utilization = 0.1;
-        
+
         if (!backlog.isEmpty()) {
-            utilization = alpha_utilization+ (1-alpha_utilization)*utilization;
-            
+            utilization = alpha_utilization + (1 - alpha_utilization) * utilization;
+
             // If we have packet loss nothing happens
             if (Math.random() < packet_loss) {
                 return;
             }
-            
+
             Packet packet = backlog.poll();
             if (packet.dst == this) {
                 System.err.println("This should not happen :(");
@@ -108,29 +108,41 @@ public class Node {
 //                        + "... Dropping packet");
             }
         } else {
-            utilization = (1-alpha_utilization)*utilization;
+            utilization = (1 - alpha_utilization) * utilization;
         }
     }
 
     public void receive(Packet packet) {
         if (packet.dst == this) {
-     //       System.out.println("Packet arrived to its destination at " + this);
+            //       System.out.println("Packet arrived to its destination at " + this);
             packet.connection.ack(packet);
         } else {
             backlog.add(packet);
         }
     }
-    
+
     public Double getLoad() {
         return (1.0 * backlog.size()) / reservations.size();
     }
-    
+
     public Double getX() {
-        if (backlog.size() == 0) {
-            System.err.println("X cannot be computed if backlog is zero");
-            System.exit(-1);
-        }
-        return (reservations.size()*1D)/backlog.size();
+//        if (backlog.size() == 0) {
+//            System.err.println("X cannot be computed if backlog is zero");
+//            System.exit(-1);
+//        }
+        return (reservations.size() * 1D) / Math.max(backlog.size(), 1);
     }
     
+    public void newFrame() {
+        x_2 = x_1;
+        x_1 = getX();
+    }
+
+    public Double getX_1() {
+        return x_1;
+    }
+
+    public Double getX_2() {
+        return x_2;
+    }
 }

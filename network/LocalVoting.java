@@ -38,8 +38,10 @@ public class LocalVoting extends TDMAScheduller {
         currentFrame++;
 //        currentSlot = 0;
         for (Node node : network.nodes) {
+// Remove only one slot instead of all of them         
             if (node.backlog.isEmpty()) {
-                while (node.reservations.size() > 0) {
+//                while (node.reservations.size() > 0) {
+                if (node.reservations.size() > 0) {
                     node.removeSlot();
                     if (verbose == verbose.PRINT_W && simulator.now > Statistics.starttime) {
                         System.out.println(node.id + "\t-1");
@@ -57,7 +59,7 @@ public class LocalVoting extends TDMAScheduller {
                 } else if (verbose == verbose.PRINT_W && simulator.now > Statistics.starttime) {
                     System.out.println(node.id + "\t1");
                 }
-            } 
+            }
         }
 
         loadBalance();
@@ -65,29 +67,45 @@ public class LocalVoting extends TDMAScheduller {
         if (verbose == Verbose.PRINT_QUEUE_LENGTHS) {
             System.out.print(simulator.now + "\t");
             for (Node node : network.nodes) {
-                System.out.print(node.backlog.size() + "\t");
+                System.out.print(node.backlog.size() + /* ":" + node.reservations.size() + */ "\t");
             }
             System.out.println();
         }
 
 //        simulator.offer(new Event(simulator.now + network.slots.size()
 //                * slotTime, EventType.NextFrame, this));
+        
+        for (Node node: network.nodes) {
+            node.newFrame();
+        }
+        
     }
 
     public Map<Node, Queue<Node>> createAij() {
         Map<Node, Queue<Node>> result = new HashMap<>();
 
-        for (Node node : network.nodes) {
+        for (final Node node : network.nodes) {
             if (node.backlog.size() > 0) {
                 result.put(node, new PriorityQueue<>(node.neighbors.size(),
                         new Comparator<Node>() {
                     @Override
                     public int compare(Node o1, Node o2) {
-                        return -o1.getX().compareTo(o2.getX());
+                        Double d1 = node.neighbors.contains(o1) ? o1.getX_1() : o1.getX_2();
+                        Double d2 = node.neighbors.contains(o2) ? o2.getX_1() : o2.getX_2();
+                        return -d1.compareTo(d2);
                     }
                 }));
-                for (Node neighbor : node.neighbors) {
-                    if (neighbor.backlog.size() > 0) {
+                Set<Node> twohop = new HashSet<>();
+                twohop.addAll(node.neighbors);
+
+                for (Node t : node.neighbors) {
+                    twohop.addAll(t.neighbors);
+                }
+                twohop.remove(node);
+
+
+                for (Node neighbor : twohop) {
+                    if (neighbor.reservations.size() > 0) {
                         if (getSlot(node, neighbor) != null) {
                             result.get(node).offer(neighbor);
                         }
@@ -128,7 +146,10 @@ public class LocalVoting extends TDMAScheduller {
                 double u_temp = 0D;
                 for (Node neighbor : aij.get(node)) {
                     if (neighbor.backlog.size() > 0) {
-                        u_temp += (neighbor.getX() - node.getX())/aij.get(node).size();
+                        u_temp += Math.max(
+                                1, node.backlog.size())
+                                * ((node.neighbors.contains(neighbor) ? neighbor.getX_1() : neighbor.getX_2())
+                                - node.getX()) / aij.get(node).size();
                     }
                 }
                 u.offer(new Element(node, (long) Math.ceil(u_temp)));
@@ -152,7 +173,8 @@ public class LocalVoting extends TDMAScheduller {
                 Node other = aij.get(e.node).poll();
                 removed.add(other);
                 Reservation res = getSlot(e.node, other);
-                if (res != null && (other.getX() > e.node.getX())) {
+                if (res != null && ((e.node.neighbors.contains(other) ? other.getX_1() : other.getX_2())
+                        > e.node.getX())) {
                     if (verbose == Verbose.PRINT_SLOT_EXCHANGE) {
                         System.out.println(other.id + ":" + other.reservations.size() + ":" + other.backlog.size()
                                 + "-->" + e.node.id + ":" + e.node.reservations.size() + ":" + e.node.backlog.size());
