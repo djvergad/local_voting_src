@@ -23,22 +23,26 @@ public class StabilityTest {
     public static void main(String [] args) {
 
 //        LocalVoting.verbose = LocalVoting.Verbose.PRINT_QUEUE_LENGTHS;
-        SimpleDynamic.verbose = SimpleDynamic.Verbose.PRINT_QUEUE_LENGTHS;
+//        SimpleDynamic.verbose = SimpleDynamic.Verbose.PRINT_QUEUE_LENGTHS;
         //Scenario scenario = new Scenario(100, 10, 100, 10);
+//        LocalVoting.verbose = LocalVoting.Verbose.PRINT_DMAX;
+        LocalVoting.verbose = LocalVoting.Verbose.PRINT_DMAX;
         
         int nodes = 100;
         double transmissionRange = 10;
         double topologySize = 100;
         int slots = 10;
-//        int connections = 30;
-        int connections = 15;
-//         Scenario.SchedulerType type = Scenario.SchedulerType.LocalVoting;
-       Scenario.SchedulerType type = Scenario.SchedulerType.Simple;
+        int connections = 30;
+//        int connections = 15;
+         Scenario.SchedulerType type = Scenario.SchedulerType.LocalVoting;
+//       Scenario.SchedulerType type = Scenario.SchedulerType.Simple;
 
 //        Scenario scenario = new Scenario(10, 10, 50, 10, Scenario.SchedulerType.Balanced);
         Scenario scenario = new Scenario(nodes, transmissionRange, topologySize, slots, type);
         Set<Connection> trafficGenerators = StartGenerator.generate(connections, scenario);
         scenario.simulator.run();
+        
+        LocalVoting.AMax.getMaxAij();
         
 //        scenario.printStats();
 //        for (Connection tg : trafficGenerators) {

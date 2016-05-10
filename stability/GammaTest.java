@@ -15,7 +15,7 @@ import network.Scenario;
  *
  * @author bruker
  */
-public class ExpoTest {
+public class GammaTest {
 
     /**
      * @param args the command line arguments
@@ -37,11 +37,16 @@ public class ExpoTest {
         Node.packet_loss = 0.0D;
 
 //        Scenario scenario = new Scenario(10, 10, 50, 10, Scenario.SchedulerType.Balanced);
-        Scenario scenario = new Scenario(nodes, transmissionRange, topologySize, slots, type);
-        ExpoGenerator expoGen = new ExpoGenerator(scenario, arrivalRate, 0.001);
 
-//        Set<Connection> connectionSet = expoGen.conSet;
-        scenario.simulator.run();
+        for (LocalVoting.gamma = 0.001; LocalVoting.gamma <= 1000; LocalVoting.gamma *= 10) {
+
+            for (int i = 0; i < 10; i++) {
+
+                Scenario scenario = new Scenario(nodes, transmissionRange, topologySize, slots, type);
+                ExpoGenerator expoGen = new ExpoGenerator(scenario, arrivalRate, 0.001);
+
+                Set<Connection> connectionSet = expoGen.conSet;
+                scenario.simulator.run();
 
 //        scenario.printStats();
 //        for (Connection conn : connectionSet) {
@@ -49,7 +54,10 @@ public class ExpoTest {
 //            conn.dump();
 //        }
 
-        expoGen.stats.dump();
+                System.out.print("gamma=\t" +LocalVoting.gamma + "\ti=\t"+i+"\t");
+                expoGen.stats.dump();
+            }
+        }
 
     }
 }
