@@ -26,7 +26,7 @@ public class StabilityTest {
 //        SimpleDynamic.verbose = SimpleDynamic.Verbose.PRINT_QUEUE_LENGTHS;
         //Scenario scenario = new Scenario(100, 10, 100, 10);
 //        LocalVoting.verbose = LocalVoting.Verbose.PRINT_DMAX;
-        LocalVoting.verbose = LocalVoting.Verbose.PRINT_DMAX;
+        LocalVoting.verbose = LocalVoting.Verbose.PRINT_SLOT_EXCHANGE;
         
         int nodes = 100;
         double transmissionRange = 10;
