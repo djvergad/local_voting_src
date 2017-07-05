@@ -44,10 +44,10 @@ public class StabilityTest {
         
         LocalVoting.AMax.getMaxAij();
         
-//        scenario.printStats();
-//        for (Connection tg : trafficGenerators) {
-//            System.out.println("Connection: " +tg.getTotalTime());
-//        }
+        scenario.printStats();
+        for (Connection tg : trafficGenerators) {
+            System.out.println("Connection: " +tg.getTotalTime());
+        }
         
     }
 }
