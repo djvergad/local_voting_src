@@ -6,6 +6,7 @@ package network;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -17,7 +18,7 @@ import java.util.Set;
  */
 public class Node {
 
-    Queue<Packet> backlog = new PriorityQueue<>();
+    Queue<Packet> backlog = new LinkedList<>();
     Map<Node, Node> routingtable;
     Map<Node, Double> distance;
     Set<Node> neighbors = new HashSet<>();
@@ -29,7 +30,7 @@ public class Node {
     double weight = 1;
     double utilization = 0;
     public static double packet_loss = 0D;
-    Double x_1=0D, x_2=0D;
+    Double x_1 = 0D, x_2 = 0D;
 
     public Node() {
         id = id_helper++;
@@ -112,6 +113,38 @@ public class Node {
         }
     }
 
+    void transmit(Packet packet) {
+
+        double alpha_utilization = 0.1;
+
+        if (!backlog.isEmpty() && backlog.contains(packet)) {
+            utilization = alpha_utilization + (1 - alpha_utilization) * utilization;
+
+            // If we have packet loss nothing happens
+            if (Math.random() < packet_loss) {
+                return;
+            }
+
+            backlog.remove(packet);
+            
+            if (packet.dst == this) {
+                System.err.println("This should not happen :(");
+                System.exit(-1);
+            }
+            if (routingtable.containsKey(packet.dst)) {
+//                System.out.println("Node " + this+ " forwarding packet to "
+//                        + routingtable.get(packet.dst) + ", final destination "
+//                        + packet.dst);
+                routingtable.get(packet.dst).receive(packet);
+            } else {
+//                System.out.println("Can't find route to " + packet.dst
+//                        + "... Dropping packet");
+            }
+        } else {
+            utilization = (1 - alpha_utilization) * utilization;
+        }
+    }
+
     public void receive(Packet packet) {
         if (packet.dst == this) {
             //       System.out.println("Packet arrived to its destination at " + this);
@@ -132,7 +165,7 @@ public class Node {
 //        }
         return (reservations.size() * 1D) / Math.max(backlog.size(), 1);
     }
-    
+
     public void newFrame() {
         x_2 = x_1;
         x_1 = getX();

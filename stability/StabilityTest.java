@@ -34,7 +34,7 @@ public class StabilityTest {
         int slots = 10;
         int connections = 30;
 //        int connections = 15;
-         Scenario.SchedulerType type = Scenario.SchedulerType.LocalVoting;
+         Scenario.SchedulerType type = Scenario.SchedulerType.LQFLinkScheduller;
 //       Scenario.SchedulerType type = Scenario.SchedulerType.Simple;
 
 //        Scenario scenario = new Scenario(10, 10, 50, 10, Scenario.SchedulerType.Balanced);
