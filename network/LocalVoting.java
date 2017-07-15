@@ -5,13 +5,15 @@
 package network;
 
 import application.Statistics;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.Set;
 import simulator.Simulator;
 
 /**
@@ -45,7 +47,7 @@ public class LocalVoting extends TDMAScheduller {
 // Remove only one slot instead of all of them         
             if (node.backlog.isEmpty()) {
 //                while (node.reservations.size() > 0) {
-                if (node.reservations.size() > 0) {
+                while (node.reservations.size() > 0) {
                     node.removeSlot();
                     if (verbose == verbose.PRINT_W && simulator.now > Statistics.starttime) {
                         System.out.println(node.id + "\t-1");
@@ -54,7 +56,9 @@ public class LocalVoting extends TDMAScheduller {
             }
         }
 
-        for (Node node : network.nodes) {
+        List<Node> nodes_shuffled = new ArrayList(network.nodes);
+        Collections.shuffle(nodes_shuffled);
+        for (Node node : nodes_shuffled) {
 
             if (!node.backlog.isEmpty()) {
                 if (!network.findSlot(node)) {
@@ -66,7 +70,7 @@ public class LocalVoting extends TDMAScheduller {
             }
         }
 
-        loadBalance();
+        loadBalance(nodes_shuffled);
 
         if (verbose == Verbose.PRINT_QUEUE_LENGTHS) {
             System.out.print(simulator.now + "\t");
@@ -90,7 +94,6 @@ public class LocalVoting extends TDMAScheduller {
 
 //        simulator.offer(new Event(simulator.now + network.slots.size()
 //                * slotTime, EventType.NextFrame, this));
-
         for (Node node : network.nodes) {
             node.newFrame();
         }
@@ -141,72 +144,54 @@ public class LocalVoting extends TDMAScheduller {
         }
     }
 
-    public void loadBalance() {
+    public void loadBalance(List<Node> nodes) {
 
-        Map<Node, Queue<Node>> aij = createAij();
+        Map<Node, Double> u_t_1 = new HashMap<>();
 
-        if (verbose == Verbose.PRINT_DMAX) {
-            AMax.addMatrix(aij);
+        for (Node node : nodes) {
+            double sum_p_j = node.neighbors.stream().mapToDouble(neighbor -> {
+                return neighbor.reservations.size();
+            }).sum() + node.reservations.size();
+            double sum_q_j_1 = node.neighbors.stream().mapToDouble(neighbor -> {
+                return neighbor.backlog.size();
+            }).sum() + node.backlog.size();
+            u_t_1.put(node, node.backlog.size() * sum_p_j / sum_q_j_1 - node.reservations.size());
         }
 
-        //Map<Node, Long> u = new HashMap<>();
+        int[] slots_gained_or_lost = new int[network.nodes.size()];
 
-        Queue<Element> u = new PriorityQueue<>();
+        for (Node node : nodes) {
+            Node[] neighbors = node.neighbors.toArray(new Node[0]);
+            Arrays.sort(neighbors, (n1, n2) -> u_t_1.get(n1).compareTo(u_t_1.get(n2)));
 
-        for (Node node : network.nodes) {
-            if (aij.containsKey(node)) {
-                double u_temp = 0D;
-                for (Node neighbor : aij.get(node)) {
-                    u_temp += 1D / aij.get(node).size() * Math.max(1, node.backlog.size()) / Math.max(1, neighbor.backlog.size())
-                            * (neighbor.reservations.size() - node.reservations.size());
-                }
-                u.offer(new Element(node, (long) Math.round(u_temp * gamma)));
-            }
-        }
-        if (verbose == Verbose.PRINT_SLOT_EXCHANGE) {
-            long s = 0L;
-            for (Element e : u) {
-                System.out.print(e.node.id + ":" + e.u + "\t");
-                s += e.u;
-            }
-            System.out.println("total:\t" + s);
-        }
+            double u_i = u_t_1.get(node);
 
-        while (u.size() > 0 && u.peek().u > 0) {
-            Element e = u.poll();
+            for (Node neighbor : neighbors) {
+                if (u_i - slots_gained_or_lost[node.id] > 0) {
+                    double u_j = u_t_1.get(neighbor);
+                    if (u_i < u_j) {
+                        long r = Math.round(Math.min(Math.min(u_i, (u_i - u_j) / 2), neighbor.reservations.size() - 1));
 
-            boolean found = false;
-            Set<Node> removed = new HashSet<>();
-            while (!aij.get(e.node).isEmpty()) {
-                Node other = aij.get(e.node).poll();
-                removed.add(other);
-                Reservation res = getSlot(e.node, other);
-                if (res != null && (other.getX() > e.node.getX())) {
-                    if (verbose == Verbose.PRINT_SLOT_EXCHANGE) {
-                        System.out.println(other.id + ":" + other.reservations.size() + ":" + other.backlog.size()
-                                + "-->" + e.node.id + ":" + e.node.reservations.size() + ":" + e.node.backlog.size());
+                        for (int i = 0; i < r; i++) {
+                            Reservation res = getSlot(node, neighbor);
+                            if (res != null) {
+                                if (verbose == Verbose.PRINT_SLOT_EXCHANGE) {
+                                    System.out.println(neighbor.id + ":" + neighbor.reservations.size() + ":" + neighbor.backlog.size()
+                                            + "-->" + node.id + ":" + node.reservations.size() + ":" + node.backlog.size());
+                                }
+                                res.sender.reservations.remove(res);
+                                slots_gained_or_lost[node.id]++;
+                                slots_gained_or_lost[neighbor.id]--;
+                                res.slot.reservations.remove(res);
+                                res.slot.addNode(node);
+
+                            }
+                        }
                     }
-                    res.sender.reservations.remove(res);
-                    res.slot.reservations.remove(res);
-                    res.slot.addNode(e.node);
-                    e.u--;
-                    found = true;
-                    break;
                 }
             }
-            aij.get(e.node).addAll(removed);
-            if (found) {
-                u.offer(e);
-            }
         }
-        if (verbose == Verbose.PRINT_SLOT_EXCHANGE) {
-            long s = 0L;
-            for (Element e : u) {
-                System.out.print(e.node.id + ":" + e.u + "\t");
-                s += e.u;
-            }
-            System.out.println("total2:\t" + s);
-        }
+
     }
 
     public static class AMax {

@@ -163,7 +163,7 @@ public class Node {
 //            System.err.println("X cannot be computed if backlog is zero");
 //            System.exit(-1);
 //        }
-        return (reservations.size() * 1D) / Math.max(backlog.size(), 1);
+        return (reservations.size() * 1D) / backlog.size();
     }
 
     public void newFrame() {
