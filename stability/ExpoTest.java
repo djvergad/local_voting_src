@@ -26,7 +26,11 @@ public class ExpoTest {
 //        LocalVoting.verbose = LocalVoting.Verbose.PRINT_QUEUE_LENGTHS;
 //        LocalVoting.verbose = LocalVoting.Verbose.PRINT_SLOTS;
 //        LocalVoting.verbose = LocalVoting.Verbose.PRINT_X;
-
+//        LocalVoting.verbose.add(LocalVoting.Verbose.PRINT_SLOTS);
+//        LocalVoting.verbose.add(LocalVoting.Verbose.PRINT_QUEUE_LENGTHS);
+//        LocalVoting.verbose.add(LocalVoting.Verbose.PRINT_X);
+//        LocalVoting.verbose.add(LocalVoting.Verbose.PRINT_SLOT_EXCHANGE);
+                
         int nodes = 100;
         double transmissionRange = 10;
         double topologySize = 100;

@@ -10,10 +10,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Set;
 import simulator.Simulator;
 
 /**
@@ -32,7 +35,7 @@ public class LocalVoting extends TDMAScheduller {
         PRINT_X,
         PRINT_DMAX
     }
-    public static Verbose verbose;
+    public static Set<Verbose> verbose = new HashSet<>();
     public static double gamma = 50D;
 
     public LocalVoting(Network network, Simulator simulator, double slotTime) {
@@ -49,7 +52,7 @@ public class LocalVoting extends TDMAScheduller {
 //                while (node.reservations.size() > 0) {
                 while (node.reservations.size() > 0) {
                     node.removeSlot();
-                    if (verbose == verbose.PRINT_W && simulator.now > Statistics.starttime) {
+                    if (verbose.contains(Verbose.PRINT_W) && simulator.now > Statistics.starttime) {
                         System.out.println(node.id + "\t-1");
                     }
                 }
@@ -58,34 +61,51 @@ public class LocalVoting extends TDMAScheduller {
 
         List<Node> nodes_shuffled = new ArrayList(network.nodes);
         Collections.shuffle(nodes_shuffled);
-        for (Node node : nodes_shuffled) {
 
-            if (!node.backlog.isEmpty()) {
+        Map<Node, Integer> to_add = new HashMap<>();
+        for (Node node : nodes_shuffled) {
+            if (node.backlog.size() > node.reservations.size()) {
+                to_add.put(node, node.backlog.size() - node.reservations.size());
+            }
+        }
+
+        while (to_add.size() > 0) {
+            for (Node node : nodes_shuffled) {
+                if (to_add.get(node) == null) {
+                    continue;
+                }
                 if (!network.findSlot(node)) {
-                    //    loadBalance(node);
-//                    System.out.println("No slots available!!!");
-                } else if (verbose == verbose.PRINT_W && simulator.now > Statistics.starttime) {
-                    System.out.println(node.id + "\t1");
+                    to_add.remove(node);
+                } else {
+                    int rem = to_add.get(node) - 1;
+                    if (rem <= 0) {
+                        to_add.remove(node);
+                    }
+                    if (verbose.contains(Verbose.PRINT_W) && simulator.now > Statistics.starttime) {
+                        System.out.println(node.id + "\t1");
+                    }
                 }
             }
         }
 
         loadBalance(nodes_shuffled);
 
-        if (verbose == Verbose.PRINT_QUEUE_LENGTHS) {
-            System.out.print(simulator.now + "\t");
+        if (verbose.contains(Verbose.PRINT_QUEUE_LENGTHS)) {
+            System.out.print(simulator.now + "\tqueue\t");
             for (Node node : network.nodes) {
-                System.out.print(node.backlog.size() + /* ":" + node.reservations.size() + */ "\t");
+                System.out.print(node.backlog.size() + ":" + node.reservations.size() + "\t");
             }
             System.out.println();
-        } else if (verbose == Verbose.PRINT_SLOTS) {
-            System.out.print(simulator.now + "\t");
+        }
+        if (verbose.contains(Verbose.PRINT_SLOTS)) {
+            System.out.print(simulator.now + "\tSlots\t");
             for (Node node : network.nodes) {
                 System.out.print(node.reservations.size() + /* ":" + node.reservations.size() + */ "\t");
             }
             System.out.println();
-        } else if (verbose == Verbose.PRINT_X) {
-            System.out.print(simulator.now + "\t");
+        }
+        if (verbose.contains(Verbose.PRINT_X)) {
+            System.out.print(simulator.now + "\tX:\t");
             for (Node node : network.nodes) {
                 System.out.print(node.getX() + /* ":" + node.reservations.size() + */ "\t");
             }
@@ -158,40 +178,42 @@ public class LocalVoting extends TDMAScheduller {
             u_t_1.put(node, node.backlog.size() * sum_p_j / sum_q_j_1 - node.reservations.size());
         }
 
-        int[] slots_gained_or_lost = new int[network.nodes.size()];
+        Node[] nodes_sorted = nodes.toArray(new Node[0]);
+        Arrays.sort(nodes_sorted, (n1, n2) -> -(u_t_1.get(n1).compareTo(u_t_1.get(n2))));
 
-        for (Node node : nodes) {
+        for (Node node : nodes_sorted) {
             Node[] neighbors = node.neighbors.toArray(new Node[0]);
             Arrays.sort(neighbors, (n1, n2) -> u_t_1.get(n1).compareTo(u_t_1.get(n2)));
 
-            double u_i = u_t_1.get(node);
-
             for (Node neighbor : neighbors) {
-                if (u_i - slots_gained_or_lost[node.id] > 0) {
-                    double u_j = u_t_1.get(neighbor);
-                    if (u_i < u_j) {
-                        long r = Math.round(Math.min(Math.min(u_i, (u_i - u_j) / 2), neighbor.reservations.size() - 1));
+                double u_i = u_t_1.get(node);
 
+                if (u_i > 0) {
+                    double u_j = u_t_1.get(neighbor);
+                    if (u_i > u_j) {
+                        int r = (int) Math.round(Math.min(Math.min(u_i, (u_i - u_j) / 2), neighbor.reservations.size() - 1));
+                        //System.out.println("Hello!, r= " + r + " u_i= " + u_i + " u_j= " +u_j + " res= " +neighbor.reservations.size() );
                         for (int i = 0; i < r; i++) {
                             Reservation res = getSlot(node, neighbor);
                             if (res != null) {
-                                if (verbose == Verbose.PRINT_SLOT_EXCHANGE) {
+
+                                if (verbose.contains(Verbose.PRINT_SLOT_EXCHANGE)) {
                                     System.out.println(neighbor.id + ":" + neighbor.reservations.size() + ":" + neighbor.backlog.size()
                                             + "-->" + node.id + ":" + node.reservations.size() + ":" + node.backlog.size());
                                 }
                                 res.sender.reservations.remove(res);
-                                slots_gained_or_lost[node.id]++;
-                                slots_gained_or_lost[neighbor.id]--;
+                                u_t_1.put(node, u_i - 1);
+                                u_i--;
+                                u_t_1.put(neighbor, u_j + 1);
+                                u_j++;
                                 res.slot.reservations.remove(res);
                                 res.slot.addNode(node);
-
                             }
                         }
                     }
                 }
             }
         }
-
     }
 
     public static class AMax {
@@ -209,7 +231,7 @@ public class LocalVoting extends TDMAScheduller {
         }
 
         public static void getMaxAij() {
-            if (LocalVoting.verbose == LocalVoting.Verbose.PRINT_DMAX) {
+            if (LocalVoting.verbose.contains(LocalVoting.Verbose.PRINT_DMAX)) {
                 for (int i = 0; i < a.length; i++) {
                     for (int j = 0; j < a[i].length; j++) {
                         System.out.print(a[i][j] / count + "\t");
