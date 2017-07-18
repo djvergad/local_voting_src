@@ -59,18 +59,19 @@ public class LocalVoting extends TDMAScheduller {
             }
         }
 
-        List<Node> nodes_shuffled = new ArrayList(network.nodes);
-        Collections.shuffle(nodes_shuffled);
+        Node[] nodes_sorted = network.nodes.toArray(new Node[0]);
+        // Collections.shuffle(nodes_shuffled);
+        Arrays.sort(nodes_sorted, (n1, n2) -> -n1.getX().compareTo(n2.getX()));
 
         Map<Node, Integer> to_add = new HashMap<>();
-        for (Node node : nodes_shuffled) {
+        for (Node node : nodes_sorted) {
             if (node.backlog.size() > node.reservations.size()) {
                 to_add.put(node, node.backlog.size() - node.reservations.size());
             }
         }
 
         while (to_add.size() > 0) {
-            for (Node node : nodes_shuffled) {
+            for (Node node : nodes_sorted) {
                 if (to_add.get(node) == null) {
                     continue;
                 }
@@ -88,7 +89,7 @@ public class LocalVoting extends TDMAScheduller {
             }
         }
 
-        loadBalance(nodes_shuffled);
+        loadBalance(nodes_sorted);
 
         if (verbose.contains(Verbose.PRINT_QUEUE_LENGTHS)) {
             System.out.print(simulator.now + "\tqueue\t");
@@ -164,7 +165,7 @@ public class LocalVoting extends TDMAScheduller {
         }
     }
 
-    public void loadBalance(List<Node> nodes) {
+    public void loadBalance(Node[] nodes) {
 
         Map<Node, Double> u_t_1 = new HashMap<>();
 
@@ -178,7 +179,7 @@ public class LocalVoting extends TDMAScheduller {
             u_t_1.put(node, node.backlog.size() * sum_p_j / sum_q_j_1 - node.reservations.size());
         }
 
-        Node[] nodes_sorted = nodes.toArray(new Node[0]);
+        Node[] nodes_sorted = nodes.clone();
         Arrays.sort(nodes_sorted, (n1, n2) -> -(u_t_1.get(n1).compareTo(u_t_1.get(n2))));
 
         for (Node node : nodes_sorted) {
