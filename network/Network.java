@@ -4,6 +4,7 @@
  */
 package network;
 
+import application.Statistics;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ public class Network {
 
     public ArrayList<Node> nodes;
     ArrayList<Slot> slots;
+    public Statistics stats;
 
     boolean findSlot(Node node) {
         for (Slot slot : slots) {

@@ -4,12 +4,10 @@
  */
 package stability;
 
-import application.Connection;
 import application.ExpoGenerator;
-import java.util.Set;
-import network.LocalVoting;
 import network.Node;
 import network.Scenario;
+import network.TDMAScheduller;
 
 /**
  *
@@ -30,7 +28,8 @@ public class ExpoTest {
 //        LocalVoting.verbose.add(LocalVoting.Verbose.PRINT_QUEUE_LENGTHS);
 //        LocalVoting.verbose.add(LocalVoting.Verbose.PRINT_X);
 //        LocalVoting.verbose.add(LocalVoting.Verbose.PRINT_SLOT_EXCHANGE);
-                
+        TDMAScheduller.print_queues = true;
+
         int nodes = 100;
         double transmissionRange = 10;
         double topologySize = 100;
@@ -43,6 +42,7 @@ public class ExpoTest {
 //        Scenario scenario = new Scenario(10, 10, 50, 10, Scenario.SchedulerType.Balanced);
         Scenario scenario = new Scenario(nodes, transmissionRange, topologySize, slots, type);
         ExpoGenerator expoGen = new ExpoGenerator(scenario, arrivalRate, 0.001);
+        scenario.network.stats = expoGen.stats;
 
 //        Set<Connection> connectionSet = expoGen.conSet;
         scenario.simulator.run();
@@ -52,8 +52,8 @@ public class ExpoTest {
 //            System.out.println("Connection: " + conn.getTotalTime());
 //            conn.dump();
 //        }
-
         expoGen.stats.dump();
+        expoGen.stats.dump_hist();
 
     }
 }

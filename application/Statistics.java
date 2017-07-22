@@ -6,6 +6,8 @@ package application;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 import network.Packet;
 
 /**
@@ -45,6 +47,40 @@ public class Statistics {
     double lastReceptionTime;
     int numPackets;
     double sumDelay;
+    public Map<Integer, Integer> count_queue_lengths = new TreeMap<>();
+    public Map<Integer, Integer> count_slot_allocaations = new TreeMap<>();
+    public Map<Double, Integer> count_load = new TreeMap<>();
+
+    public void dump_hist() {
+        System.out.println("Dumping Queue:");
+        for (Entry<Integer, Integer> e : count_queue_lengths.entrySet()) {
+            System.out.printf("%d\t%d\n", e.getKey(), e.getValue());
+        }
+        System.out.println("Dumping Slots:");
+        for (Entry<Integer, Integer> e : count_slot_allocaations.entrySet()) {
+            System.out.printf("%d\t%d\n", e.getKey(), e.getValue());
+        }
+        System.out.println("Dumping Load:");
+        for (Entry<Double, Integer> e : count_load.entrySet()) {
+            System.out.printf("%f\t%d\n", e.getKey(), e.getValue());
+        }
+    }
+
+    public void log_histograms(int queue, int slots) {
+        add_to_int_map(count_queue_lengths, queue);
+        add_to_int_map(count_slot_allocaations, slots);
+        add_to_double_map(count_load, (1.0D * queue) / slots);
+    }
+
+    private void add_to_int_map(Map<Integer, Integer> map, Integer key) {
+        int count = map.containsKey(key) ? map.get(key) : 0;
+        map.put(key, count + 1);
+    }
+
+    private void add_to_double_map(Map<Double, Integer> map, Double key) {
+        int count = map.containsKey(key) ? map.get(key) : 0;
+        map.put(key, count + 1);
+    }
 
     public void log(Packet packet, double timeReceived) {
         if (timeReceived > starttime) {
@@ -61,6 +97,7 @@ public class Statistics {
             conStatMap.get(packet.connection).log(packet, timeReceived);
         }
     }
+
 
     public void dump() {
         System.out.print("STATSDUMP\tThroughput:\t" + numPackets

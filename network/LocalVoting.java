@@ -47,10 +47,8 @@ public class LocalVoting extends TDMAScheduller {
         currentFrame++;
 //        currentSlot = 0;
         for (Node node : network.nodes) {
-// Remove only one slot instead of all of them         
             if (node.backlog.isEmpty()) {
-//                while (node.reservations.size() > 0) {
-                if (node.reservations.size() > 0) {
+                while (node.reservations.size() > 0) {
                     node.removeSlot();
                     if (verbose.contains(Verbose.PRINT_W) && simulator.now > Statistics.starttime) {
                         System.out.println(node.id + "\t-1");

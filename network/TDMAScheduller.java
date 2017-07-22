@@ -4,6 +4,8 @@
  */
 package network;
 
+import java.util.Map;
+import java.util.TreeMap;
 import simulator.Event;
 import simulator.EventType;
 import simulator.Handleable;
@@ -20,6 +22,7 @@ public class TDMAScheduller implements Handleable {
     public double slotTime;
     int currentSlot;
     int currentFrame;
+    public static boolean print_queues = false;
 
     public TDMAScheduller(Network network, Simulator simulator,
             double slotTime) {
@@ -37,8 +40,12 @@ public class TDMAScheduller implements Handleable {
             nextFrame();
         }
 
+        if (print_queues) {
+            for (Node node: network.nodes) {
+                network.stats.log_histograms(node.backlog.size(), node.reservations.size());
+            }
+        }
 
-//        System.out.println(simulator.now + " Slot " + currentSlot);
         for (Reservation reservation : network.slots.get(currentSlot).reservations) {
             reservation.sender.transmit();
         }
