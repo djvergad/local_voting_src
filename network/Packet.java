@@ -18,6 +18,7 @@ public class Packet implements Comparable<Packet>{
     public int sequenceNumber;
     public Connection connection;
     public double timeSent;
+    public double timeEnQueued;
 
     public Packet(Node src, Node dst, int sequenceNumber, Connection trafficGenerator) {
         this.src = src;
@@ -33,5 +34,8 @@ public class Packet implements Comparable<Packet>{
         return this.id.compareTo(o.id);
     }
     
+    public void mark_queue_time() {
+        this.timeEnQueued = connection.simulator.now;
+    }
     
 }

@@ -27,7 +27,7 @@ public class Connection implements Handleable {
     int id;
     double started;
     double stopped = Double.NaN ;
-    Statistics stats;
+    public Statistics stats;
 
     public Connection(Node source, Node destination, Simulator simulator, int packets, double interval, double startTime, Statistics stats) {
         this.source = source;

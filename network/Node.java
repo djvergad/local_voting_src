@@ -53,35 +53,6 @@ public class Node {
         reservation.slot.reservations.remove(reservation);
     }
 
-    /**
-     * Obsolete
-     */
-    void transmit_no_error() {
-
-        double alpha_utilization = 0.1;
-
-        if (!backlog.isEmpty()) {
-            utilization = alpha_utilization + (1 - alpha_utilization) * utilization;
-
-            Packet packet = backlog.poll();
-            if (packet.dst == this) {
-                System.err.println("This should not happen :(");
-                System.exit(-1);
-            }
-            if (routingtable.containsKey(packet.dst)) {
-//                System.out.println("Node " + this+ " forwarding packet to "
-//                        + routingtable.get(packet.dst) + ", final destination "
-//                        + packet.dst);
-                routingtable.get(packet.dst).receive(packet);
-            } else {
-//                System.out.println("Can't find route to " + packet.dst
-//                        + "... Dropping packet");
-            }
-        } else {
-            utilization = (1 - alpha_utilization) * utilization;
-        }
-    }
-
     void transmit() {
 
         double alpha_utilization = 0.1;
@@ -100,9 +71,6 @@ public class Node {
                 System.exit(-1);
             }
             if (routingtable.containsKey(packet.dst)) {
-//                System.out.println("Node " + this+ " forwarding packet to "
-//                        + routingtable.get(packet.dst) + ", final destination "
-//                        + packet.dst);
                 routingtable.get(packet.dst).receive(packet);
             } else {
 //                System.out.println("Can't find route to " + packet.dst
@@ -132,9 +100,6 @@ public class Node {
                 System.exit(-1);
             }
             if (routingtable.containsKey(packet.dst)) {
-//                System.out.println("Node " + this+ " forwarding packet to "
-//                        + routingtable.get(packet.dst) + ", final destination "
-//                        + packet.dst);
                 routingtable.get(packet.dst).receive(packet);
             } else {
 //                System.out.println("Can't find route to " + packet.dst
@@ -146,10 +111,15 @@ public class Node {
     }
 
     public void receive(Packet packet) {
+
+        if (packet.src != this) {
+            packet.connection.stats.log_node(packet, packet.connection.simulator.now);
+        }
+        
         if (packet.dst == this) {
-            //       System.out.println("Packet arrived to its destination at " + this);
             packet.connection.ack(packet);
         } else {
+            packet.mark_queue_time();
             backlog.add(packet);
         }
     }
@@ -159,10 +129,6 @@ public class Node {
     }
 
     public Double getX() {
-//        if (backlog.size() == 0) {
-//            System.err.println("X cannot be computed if backlog is zero");
-//            System.exit(-1);
-//        }
         return (backlog.size() * 1D) / reservations.size() ;
     }
 

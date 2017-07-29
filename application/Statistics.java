@@ -48,31 +48,41 @@ public class Statistics {
     int numPackets;
     double sumDelay;
     public Map<Integer, Integer> count_queue_lengths = new TreeMap<>();
+    public Map<Long, Integer> count_nodal_delay = new TreeMap<>();
+    public Map<Long, Integer> count_endtoend_delay = new TreeMap<>();
     public Map<Integer, Integer> count_slot_allocaations = new TreeMap<>();
     public Map<Double, Integer> count_load = new TreeMap<>();
 
     public void dump_hist() {
-        System.out.println("Dumping Queue:");
-        for (Entry<Integer, Integer> e : count_queue_lengths.entrySet()) {
+//        System.out.println("Dumping Queue:");
+//        for (Entry<Integer, Integer> e : count_queue_lengths.entrySet()) {
+//            System.out.printf("%d\t%d\n", e.getKey(), e.getValue());
+//        }
+//        System.out.println("Dumping Slots:");
+//        for (Entry<Integer, Integer> e : count_slot_allocaations.entrySet()) {
+//            System.out.printf("%d\t%d\n", e.getKey(), e.getValue());
+//        }
+//        System.out.println("Dumping Load:");
+//        for (Entry<Double, Integer> e : count_load.entrySet()) {
+//            System.out.printf("%f\t%d\n", e.getKey(), e.getValue());
+//        }
+        System.out.println("Dumping Endtoend:");
+        for (Entry<Long, Integer> e : count_endtoend_delay.entrySet()) {
             System.out.printf("%d\t%d\n", e.getKey(), e.getValue());
         }
-        System.out.println("Dumping Slots:");
-        for (Entry<Integer, Integer> e : count_slot_allocaations.entrySet()) {
+        System.out.println("Dumping nodal:");
+        for (Entry<Long, Integer> e : count_nodal_delay.entrySet()) {
             System.out.printf("%d\t%d\n", e.getKey(), e.getValue());
-        }
-        System.out.println("Dumping Load:");
-        for (Entry<Double, Integer> e : count_load.entrySet()) {
-            System.out.printf("%f\t%d\n", e.getKey(), e.getValue());
         }
     }
 
-    public void log_histograms(int queue, int slots) {
-        add_to_int_map(count_queue_lengths, queue);
-        add_to_int_map(count_slot_allocaations, slots);
-        add_to_double_map(count_load, (1.0D * queue) / slots);
-    }
-
-    private void add_to_int_map(Map<Integer, Integer> map, Integer key) {
+//    public void log_histograms(int queue, int slots) {
+//        add_to_int_map(count_queue_lengths, queue);
+//        add_to_int_map(count_slot_allocaations, slots);
+//        add_to_double_map(count_load, (1.0D * queue) / slots);
+//        
+//    }
+    private void add_to_long_map(Map<Long, Integer> map, Long key) {
         int count = map.containsKey(key) ? map.get(key) : 0;
         map.put(key, count + 1);
     }
@@ -80,6 +90,12 @@ public class Statistics {
     private void add_to_double_map(Map<Double, Integer> map, Double key) {
         int count = map.containsKey(key) ? map.get(key) : 0;
         map.put(key, count + 1);
+    }
+
+    public void log_node(Packet packet, double timeReceived) {
+        if (timeReceived > starttime) {
+            add_to_long_map(count_nodal_delay, (long) Math.ceil(timeReceived - packet.timeEnQueued));
+        }
     }
 
     public void log(Packet packet, double timeReceived) {
@@ -95,9 +111,9 @@ public class Statistics {
 
             }
             conStatMap.get(packet.connection).log(packet, timeReceived);
+            add_to_long_map(count_endtoend_delay, (long) Math.ceil(timeReceived - packet.timeSent));
         }
     }
-
 
     public void dump() {
         System.out.print("STATSDUMP\tThroughput:\t" + numPackets
@@ -121,7 +137,6 @@ public class Statistics {
             sumdt2 += Math.pow(connStats.stoptime - connStats.connection.started, 2);
 //            System.out.println("throughput:\t" + connStats.throughput()+
 //                    "\tdelay:\t"+connStats.delay());
-
 
         }
         System.out.println("\tDeliveryTime:\t" + sumdt / countdel + "\tThFair:\t" + Math.pow(sumth, 2) / (countth * sumth2)

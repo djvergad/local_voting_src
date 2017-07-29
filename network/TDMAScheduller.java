@@ -40,12 +40,6 @@ public class TDMAScheduller implements Handleable {
             nextFrame();
         }
 
-        if (print_queues) {
-            for (Node node: network.nodes) {
-                network.stats.log_histograms(node.backlog.size(), node.reservations.size());
-            }
-        }
-
         for (Reservation reservation : network.slots.get(currentSlot).reservations) {
             reservation.sender.transmit();
         }
