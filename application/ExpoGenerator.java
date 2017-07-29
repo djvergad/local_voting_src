@@ -29,7 +29,7 @@ public class ExpoGenerator implements Handleable {
         this.scenario = scenario;
         this.lamda = lamda;
         this.mi = mi;
-                
+
         nextConnection();
     }
 
@@ -37,8 +37,15 @@ public class ExpoGenerator implements Handleable {
         double interval = Math.log(Math.random()) / (-lamda);
         double duration = Math.log(Math.random()) / (-mi);
         int numpackets = (int) Math.round(duration / 5);
-        Node src = scenario.network.nodes.get((int) (Math.random() * scenario.network.nodes.size()));
-        Node dst = scenario.network.nodes.get((int) (Math.random() * scenario.network.nodes.size()));
+
+        int id_src = (int) (Math.random() * scenario.network.nodes.size());
+        int id_dst = (int) (Math.random() * (scenario.network.nodes.size() - 1));
+        if (id_dst >= id_src) {
+            id_dst++;
+        }
+        Node src = scenario.network.nodes.get(id_src);
+        Node dst = scenario.network.nodes.get(id_dst);
+
         conSet.add(new Connection(src, dst, scenario.simulator, numpackets, 5 * scenario.scheduller.slotTime, scenario.simulator.now, stats));
 
         scenario.simulator.offer(new Event(scenario.simulator.now + interval, EventType.ConnectionArrival, this));

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import network.Packet;
+import network.Scenario;
 
 /**
  *
@@ -111,6 +112,10 @@ public class Statistics {
 
             }
             conStatMap.get(packet.connection).log(packet, timeReceived);
+            if ((long) Math.ceil(timeReceived - packet.timeSent) == 0) {
+                System.err.println("This shouldn't happen! " + packet.connection.source + "\t" + packet.connection.destination + "\t" + packet.timeSent + "\t" + packet.connection.simulator.now);
+                System.exit(-1);
+            }
             add_to_long_map(count_endtoend_delay, (long) Math.ceil(timeReceived - packet.timeSent));
         }
     }

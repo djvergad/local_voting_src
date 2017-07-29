@@ -35,7 +35,7 @@ public class ExpoTest {
         double topologySize = 100;
         int slots = 10;
         double arrivalRate = 0.0001;
-        Scenario.SchedulerType type = Scenario.SchedulerType.DRAND;
+        Scenario.SchedulerType type = Scenario.SchedulerType.Lobats;
         Node.packet_loss = 0.0D;
 
 //        Scenario scenario = new Scenario(10, 10, 50, 10, Scenario.SchedulerType.Balanced);
