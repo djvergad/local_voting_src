@@ -174,7 +174,7 @@ public class LocalVoting extends TDMAScheduller {
             double sum_q_j_1 = node.neighbors.stream().mapToDouble(neighbor -> {
                 return neighbor.backlog.size();
             }).sum() + node.backlog.size();
-            u_t_1.put(node, node.backlog.size() * sum_p_j / sum_q_j_1 - node.reservations.size());
+            u_t_1.put(node, gamma * node.backlog.size() * sum_p_j / sum_q_j_1 - node.reservations.size());
         }
 
         Node[] nodes_sorted = nodes.clone();

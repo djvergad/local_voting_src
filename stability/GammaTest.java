@@ -40,7 +40,7 @@ public class GammaTest {
 
         for (LocalVoting.gamma = 0.001; LocalVoting.gamma <= 1000; LocalVoting.gamma *= 10) {
 
-            for (int i = 0; i < 10; i++) {
+          //  for (int i = 0; i < 10; i++) {
 
                 Scenario scenario = new Scenario(nodes, transmissionRange, topologySize, slots, type);
                 ExpoGenerator expoGen = new ExpoGenerator(scenario, arrivalRate, 0.001);
@@ -54,9 +54,9 @@ public class GammaTest {
 //            conn.dump();
 //        }
 
-                System.out.print("gamma=\t" +LocalVoting.gamma + "\ti=\t"+i+"\t");
+                System.out.print("gamma=\t" +LocalVoting.gamma + "\t");
                 expoGen.stats.dump();
-            }
+            //}
         }
 
     }
