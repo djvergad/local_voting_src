@@ -22,8 +22,7 @@ public class TDMAScheduller implements Handleable {
     public double slotTime;
     int currentSlot;
     int currentFrame;
-    public static boolean print_queues = false;
-
+    
     public TDMAScheduller(Network network, Simulator simulator,
             double slotTime) {
         this.network = network;

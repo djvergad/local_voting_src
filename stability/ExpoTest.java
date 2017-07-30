@@ -28,7 +28,6 @@ public class ExpoTest {
 //        LocalVoting.verbose.add(LocalVoting.Verbose.PRINT_QUEUE_LENGTHS);
 //        LocalVoting.verbose.add(LocalVoting.Verbose.PRINT_X);
 //        LocalVoting.verbose.add(LocalVoting.Verbose.PRINT_SLOT_EXCHANGE);
-        TDMAScheduller.print_queues = true;
 
         int nodes = 100;
         double transmissionRange = 10;

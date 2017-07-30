@@ -30,10 +30,6 @@ public class ExpoRun {
         Node.packet_loss = Double.valueOf(args[6]);
         
         System.out.println("we have " + args.length + " args and the value is " +Boolean.valueOf(args[8]));
-        if (args.length > 8 && Boolean.valueOf(args[8])) {
-            TDMAScheduller.print_queues = true;
-        }
-
 //        Scenario scenario = new Scenario(10, 10, 50, 10, Scenario.SchedulerType.Balanced);
         Scenario scenario = new Scenario(nodes, transmissionRange, topologySize, slots, type);        
         ExpoGenerator expoGen = new ExpoGenerator(scenario, arrivalRate, 0.001);
