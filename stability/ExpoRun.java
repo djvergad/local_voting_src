@@ -29,7 +29,7 @@ public class ExpoRun {
         Scenario.SchedulerType type = Scenario.SchedulerType.valueOf(args[5]);
         Node.packet_loss = Double.valueOf(args[6]);
         
-        System.out.println("we have " + args.length + " args and the value is " +Boolean.valueOf(args[8]));
+        
 //        Scenario scenario = new Scenario(10, 10, 50, 10, Scenario.SchedulerType.Balanced);
         Scenario scenario = new Scenario(nodes, transmissionRange, topologySize, slots, type);        
         ExpoGenerator expoGen = new ExpoGenerator(scenario, arrivalRate, 0.001);
@@ -38,6 +38,7 @@ public class ExpoRun {
         expoGen.stats.dump();
 
         if (args.length > 8 && Boolean.valueOf(args[8])) {
+            System.out.println("we have " + args.length + " args and the value is " +Boolean.valueOf(args[8]));
             expoGen.stats.dump_hist();
         }
     }
